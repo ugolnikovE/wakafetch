@@ -14,4 +14,14 @@ func main() {
 	}
 
 	println(config.Range)
+
+	stats, err := GetStats(config)
+
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "wakafetch:", err)
+	} else {
+		println("time: ", stats.TotalSeconds)
+		println("top lang: ", stats.Languages[0].Name)
+	}
+
 }

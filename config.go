@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -33,6 +34,9 @@ type Config struct {
 	// WakaTime API settings
 	APIURL string
 	APIKey string
+	// IsWakaTime is true if APIURL points to wakatime.com. Otherwise
+	// a WakaTime-compatible server, such as Wakapi, is assumed.
+	IsWakaTime bool
 
 	// Output settings
 	Range   Range
@@ -192,6 +196,7 @@ func (c *Config) ParseConfigFile() error {
 
 // NewConfig builds a Config from the config file, environment variables
 // and command-line flags, in that order of increasing priority.
+// It returns an error if the API key is not set or the API URL is malformed.
 func NewConfig() (*Config, error) {
 	var c Config
 
@@ -211,6 +216,17 @@ func NewConfig() (*Config, error) {
 
 	if c.APIURL == "" {
 		c.APIURL = defaultAPIURL
+	}
+
+	parsedURL, err := url.Parse(c.APIURL)
+	if err != nil {
+		return nil, err
+	}
+
+	if parsedURL.Host == "api.wakatime.com" || parsedURL.Host == "wakatime.com" {
+		c.IsWakaTime = true
+	} else {
+		c.IsWakaTime = false
 	}
 
 	return &c, nil
