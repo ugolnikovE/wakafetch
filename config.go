@@ -200,6 +200,10 @@ func (c *Config) ParseConfigFile() error {
 func NewConfig() (*Config, error) {
 	var c Config
 
+	// Default value for language top
+	c.LangTop.IsAll = false
+	c.LangTop.Value = 3
+
 	if err := c.ParseConfigFile(); err != nil {
 		return nil, err
 	}
